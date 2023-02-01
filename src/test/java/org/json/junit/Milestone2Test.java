@@ -109,7 +109,7 @@ public class Milestone2Test {
                 "    <zipcode>92614</zipcode>\n" +
                 "  </address>\n" +
                 "</contact>";
-        assertThrows(JSONException.class, () -> {XML.toJSONObject(new StringReader(xmlString), new JSONPointer("/contact/address/streets"));});
+        assertThrows(JSONException.class, () -> {XML.toJSONObject(new StringReader(xmlString), new JSONPointer("/contact/address/streets"));});     // invalid key path being tested for
     }
 
     @Test
@@ -129,7 +129,7 @@ public class Milestone2Test {
                     "<Output>def</Output>\n" +
                 "</Test>\n" +
             "</Tests>";
-        assertThrows(JSONException.class, () -> {XML.toJSONObject(new StringReader(xmlString), new JSONPointer("/contact/address/street"), replacement);});
+        assertThrows(JSONException.class, () -> {XML.toJSONObject(new StringReader(xmlString), new JSONPointer("/contact/address/street"), replacement);});     // invalid XML String being tested for
     }
 
     @Test
@@ -155,11 +155,7 @@ public class Milestone2Test {
                 "</page>";
         StringReader reader = new StringReader(data);
         JSONObject output = XML.toJSONObject(reader, new JSONPointer("/page/revision/contributor"));
-        assertNotEquals(-1, reader.read());
+        assertNotEquals(-1, reader.read());     // Shows there is still more of the String to read, meaning we did not parse the entire XML
     }
 
-    @Test
-    public void testReplaceOptimization() throws IOException {
-        
-    }
 }
