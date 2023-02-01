@@ -1,38 +1,21 @@
-![Json-Java logo](https://github.com/stleary/JSON-java/blob/master/images/JsonJava.png?raw=true)
-
-<sub><sup>image credit: Ismael Pérez Ortiz</sup></sub>
-
-
-JSON in Java [package org.json]
-===============================
-
-[![Maven Central](https://img.shields.io/maven-central/v/org.json/json.svg)](https://mvnrepository.com/artifact/org.json/json)
-
-**[Click here if you just want the latest release jar file.](https://search.maven.org/remotecontent?filepath=org/json/json/20220924/json-20220924.jar)**
-
-
-# Overview
-
-[JSON](http://www.JSON.org/) is a light-weight language-independent data interchange format.
-
-The JSON-Java package is a reference implementation that demonstrates how to parse JSON documents into Java objects and how to generate new JSON documents from the Java classes.
-
-Project goals include:
-* Reliable and consistent results
-* Adherence to the JSON specification 
-* Easy to build, use, and include in other projects
-* No external dependencies
-* Fast execution and low memory footprint
-* Maintain backward compatibility
-* Designed and tested to use on Java versions 1.6 - 1.11
-
-The files in this package implement JSON encoders and decoders. The package can also convert between JSON and XML, HTTP headers, Cookies, and CDL.
-
-# If you would like to contribute to this project
-
-For more information on contributions, please see [CONTRIBUTING.md](https://github.com/stleary/JSON-java/blob/master/docs/CONTRIBUTING.md)
-
-Bug fixes, code improvements, and unit test coverage changes are welcome! Because this project is currently in the maintenance phase, the kinds of changes that can be accepted are limited. For more information, please read the [FAQ](https://github.com/stleary/JSON-java/wiki/FAQ).
+# Milestone 2
+* This milestone adds two static methods to the XML class found at src/main/java/org/json
+````
+static JsonObject toJsonObject(Reader reader, JSONPointer path)
+````
+This method extracts ,and returns, a subObject at the key path defined by the JSONPointer parameter. It parses through
+the XML file until reaching the subObject and returns it without the need to parse the rest of the file (resulting in a performance
+gain from the first milestone implementation). 
+````
+static JSONObject toJSONObject(Reader reader, JSONPointer path, JSONObject replacement)
+````
+This method reaches a subObject at the key path defined by the JSONPointer parameter and replaces it with the JSONObject
+parameter. It parses through the XML file until reaching the subObject and injects the replacement JSONObject at this
+point, skipping past the old subObject (resulting in a performance gain from the first milestone implementation).
+<br/> <br/>
+* Additionally a new class of JUnit tests can be found at src/test/java/org/json/junit
+* The new class Milestone2Test has automated tests for the added functionalites in this milestone
+* Build instructions remain the same from the original JSON-java package, detailed below...
 
 # Build Instructions
 
