@@ -223,6 +223,24 @@ public class XML {
         }
     }
 
+    /**
+     * MILESTONE 3 code ================================================================================================
+     */
+
+    public interface KeyTransformer {
+        public String transform(String str);
+    }
+
+    public static void toJSONObject(Reader reader, KeyTransformer keyTransformer) {
+        String newStr = keyTransformer.transform("testWord");
+        System.out.println(newStr);
+        // return JSONObject, and change signature accordingly
+    }
+
+    /**
+     * END of MILESTONE 3 code =========================================================================================
+     */
+
     public static JSONObject toJSONObject(Reader reader, JSONPointer path, JSONObject replacement) {
 
         XMLParserConfiguration config = XMLParserConfiguration.ORIGINAL;
