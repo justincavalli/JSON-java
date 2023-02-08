@@ -232,10 +232,6 @@ public class XML {
     }
 
     public static JSONObject toJSONObject(Reader reader, KeyTransformer keyTransformer) {
-        String newStr = keyTransformer.transform("testWrd");
-        System.out.println(newStr);
-        // return JSONObject, and change signature accordingly
-
         XMLParserConfiguration config = XMLParserConfiguration.ORIGINAL;
         JSONObject jo = new JSONObject();
         XMLTokener x = new XMLTokener(reader);
