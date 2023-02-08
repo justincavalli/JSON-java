@@ -231,10 +231,21 @@ public class XML {
         public String transform(String str);
     }
 
-    public static void toJSONObject(Reader reader, KeyTransformer keyTransformer) {
-        String newStr = keyTransformer.transform("testWord");
+    public static JSONObject toJSONObject(Reader reader, KeyTransformer keyTransformer) {
+        String newStr = keyTransformer.transform("testWrd");
         System.out.println(newStr);
         // return JSONObject, and change signature accordingly
+
+        XMLParserConfiguration config = XMLParserConfiguration.ORIGINAL;
+        JSONObject jo = new JSONObject();
+        XMLTokener x = new XMLTokener(reader);
+        while (x.more()) {
+            x.skipPast("<");
+            if (x.more()) {
+                new_parse(x, jo, null, config, null, null, keyTransformer);
+            }
+        }
+        return jo;
     }
 
     /**
@@ -250,7 +261,7 @@ public class XML {
         while (x.more()) {
             x.skipPast("<");
             if (x.more()) {
-                new_parse(x, jo, null, config, pathList, replacement);
+                new_parse(x, jo, null, config, pathList, replacement, null);
             }
         }
         return jo;
@@ -265,7 +276,7 @@ public class XML {
         while (x.more() && pathList.size() > 0) {
             x.skipPast("<");
             if (x.more()) {
-                new_parse(x, jo, null, config, pathList, null);
+                new_parse(x, jo, null, config, pathList, null, null);
             }
         }
         return jo;
@@ -283,7 +294,7 @@ public class XML {
      * @return true if the close tag is processed.
      * @throws JSONException
      */
-    private static boolean new_parse(XMLTokener x, JSONObject context, String name, XMLParserConfiguration config, ArrayList<String> pathList, JSONObject replacement)
+    private static boolean new_parse(XMLTokener x, JSONObject context, String name, XMLParserConfiguration config, ArrayList<String> pathList, JSONObject replacement, KeyTransformer keyTransformer)
             throws JSONException {
         char c;
         int i;
@@ -307,7 +318,7 @@ public class XML {
         // <!
 
         // case for extracting a subObject
-        if(replacement == null) {
+        if(replacement == null && pathList != null) {
             // skip until the subObject is reached
             while(pathList.size() > 0) {
                 x.skipPast(pathList.get(0));
@@ -356,8 +367,10 @@ public class XML {
         } else if (token == SLASH) {
 
             // Close tag </
-
             token = x.nextToken();
+            // if keytransformer exists, we want to transform the closing tags before comparing
+            if(keyTransformer != null)
+                token = keyTransformer.transform((String)token);
             if (name == null) {
                 throw x.syntaxError("Mismatched close tag " + token);
             }
@@ -377,8 +390,13 @@ public class XML {
         } else {
             tagName = (String) token;
 
+            // if keytransformer exists, then transform the tag
+            if(keyTransformer != null) {
+                tagName = keyTransformer.transform(tagName);
+            }
+
             // check if the tagName matches the current key in the path
-            if(pathList.size() > 0 && tagName.equals(pathList.get(0))) {
+            if(pathList != null && pathList.size() > 0 && tagName.equals(pathList.get(0))) {
                 pathList.remove(0);
                 if(pathList.size() == 0) {
                     // we have reached the subObject path
@@ -473,7 +491,7 @@ public class XML {
 
                         } else if (token == LT) {
                             // Nested element
-                            if (new_parse(x, jsonObject, tagName, config, pathList, replacement)) {
+                            if (new_parse(x, jsonObject, tagName, config, pathList, replacement, keyTransformer)) {
                                 if (config.getForceList().contains(tagName)) {
                                     // Force the value to be an array
                                     if (jsonObject.length() == 0) {
