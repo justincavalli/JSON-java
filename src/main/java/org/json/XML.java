@@ -11,6 +11,7 @@ import java.math.BigInteger;
 import java.nio.file.InvalidPathException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 
 
@@ -228,6 +229,12 @@ public class XML {
      */
 
     public interface KeyTransformer {
+        /**
+         *  Pairing of transformed keys to original keys. This will be used to check if two
+         *  different keys are transformed to be the same. Should throw JSONException in such
+         *  a case.
+         */
+        public HashMap<String, String> key_transform_pairing = new HashMap<String, String>();
         public String transform(String str);
     }
 
@@ -365,8 +372,10 @@ public class XML {
             // Close tag </
             token = x.nextToken();
             // if keytransformer exists, we want to transform the closing tags before comparing
-            if(keyTransformer != null)
-                token = keyTransformer.transform((String)token);
+            if(keyTransformer != null) {
+                keyTransformer.key_transform_pairing.put(keyTransformer.transform((String) token), (String)token);  // add to key transform pairing
+                token = keyTransformer.transform((String) token);
+            }
             if (name == null) {
                 throw x.syntaxError("Mismatched close tag " + token);
             }
@@ -389,6 +398,14 @@ public class XML {
             // if keytransformer exists, then transform the tag
             if(keyTransformer != null) {
                 tagName = keyTransformer.transform(tagName);
+
+                // check for errors based on transformation
+                if(keyTransformer.key_transform_pairing.containsKey(tagName) &&
+                        ! keyTransformer.key_transform_pairing.get(tagName).equals((String)token)) {
+                    throw new JSONException("Two different keys were transformed to the same key");
+                }
+                if(tagName.length() <= 0)
+                    throw new JSONException("Cannot have an empty String for a key");
             }
 
             // check if the tagName matches the current key in the path
