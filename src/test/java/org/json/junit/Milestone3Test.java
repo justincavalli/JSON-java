@@ -13,6 +13,7 @@ import static org.junit.Assert.*;
 public class Milestone3Test {
     @Test
     public void shouldPrependSWE() {
+        // Testing for a function that prepends swe262_ to all keys
         String data = "<?xml version=\"1.0\"?>\n" +
                 "<page>\n" +
                 "   <title>Template:Delete</title>\n" +
@@ -41,6 +42,7 @@ public class Milestone3Test {
 
     @Test
     public void shouldReverseKeys() {
+        // Testing for a function that reverses the characters of the keys
         String xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
                 "<contact>\n"+
                 "  <nick>Crista </nick>\n"+
@@ -62,6 +64,7 @@ public class Milestone3Test {
 
     @Test
     public void testRepeatedKeysError() {
+        // Testing for a function that converts two different keys, to the same key (should throw JSONException)
         String xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
                 "<contact>\n"+
                 "  <nick>Crista </nick>\n"+
@@ -81,7 +84,41 @@ public class Milestone3Test {
     }
 
     @Test
+    public void testUpperCaseKeys() {
+        // Test case for non lambda function with numbers in the keys (should not give any errors)
+        String xmlString = "\n" +
+                "<?xml version=\"1.0\"?>\n" +
+                "<customers>\n" +
+                "   <customer id=\"55000\">\n" +
+                "      <name>Charter Group</name>\n" +
+                "      <address1>\n" +
+                "         <street>100 Main</street>\n" +
+                "         <city>Framingham</city>\n" +
+                "         <state>MA</state>\n" +
+                "         <zip>01701</zip>\n" +
+                "      </address1>\n" +
+                "      <address2>\n" +
+                "         <street>720 Prospect</street>\n" +
+                "         <city>Framingham</city>\n" +
+                "         <state>MA</state>\n" +
+                "         <zip>01701</zip>\n" +
+                "      </address2>\n" +
+                "      <address3>\n" +
+                "         <street>120 Ridge</street>\n" +
+                "         <state>MA</state>\n" +
+                "         <zip>01760</zip>\n" +
+                "      </address3>\n" +
+                "   </customer>\n" +
+                "</customers>";
+
+        JSONObject output = XML.toJSONObject(new StringReader(xmlString), String::toUpperCase);
+        String expectedOutput = "{\"CUSTOMERS\":{\"CUSTOMER\":{\"id\":55000,\"ADDRESS1\":{\"ZIP\":\"01701\",\"CITY\":\"Framingham\",\"STATE\":\"MA\",\"STREET\":\"100 Main\"},\"ADDRESS3\":{\"ZIP\":\"01760\",\"STATE\":\"MA\",\"STREET\":\"120 Ridge\"},\"NAME\":\"Charter Group\",\"ADDRESS2\":{\"ZIP\":\"01701\",\"CITY\":\"Framingham\",\"STATE\":\"MA\",\"STREET\":\"720 Prospect\"}}}}";
+        assertEquals(expectedOutput, output.toString());
+    }
+
+    @Test
     public void testEmptyKeyError() {
+        // Testing for the case of converting keys to empty strings (throws a JSONException)
         String xmlString = "<?xml version=\"1.0\"?>\n" +
                 "<catalog>\n" +
                 "   <book id=\"bk101\">\n" +
