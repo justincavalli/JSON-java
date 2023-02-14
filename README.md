@@ -1,7 +1,21 @@
+# Milestone 3
+* This milestone adds one static method to the XML class found at src/main/java/org/json
+````
+static JSONObject toJSONObject(Reader reader, KeyTransformer keyTransformer)
+````
+This method is used to transform the keys in the JSONObject based on the KeyTransformer function passed as a parameter to it. By
+implementing this within the libary the key transformation can be done while parsing the XML, making no almost no difference from
+the normal toJSONObject conversion. Doing this externally would
+require parsing the entire XML once, initially, to get the JSONObject, and then again to find all the keys and do the transformation.
+<br/><br/>
+* A new class of JUnit tests can also be found at src/test/java/org/json/junit
+* The class Milestone3Test has automated tests for the added functionalities in this milestone
+* Build instructions remain the same from the origin JSON-java package detailed further below
+
 # Milestone 2
 * This milestone adds two static methods to the XML class found at src/main/java/org/json
 ````
-static JsonObject toJsonObject(Reader reader, JSONPointer path)
+static JSONObject toJSONObject(Reader reader, JSONPointer path)
 ````
 This method extracts ,and returns, a subObject at the key path defined by the JSONPointer parameter. It parses through
 the XML file until reaching the subObject and returns it without the need to parse the rest of the file (resulting in a performance
