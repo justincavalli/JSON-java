@@ -1,3 +1,9 @@
+# Milestone 4
+* This milestone adds stream functionality to JSONObjects. The changes to make this happen were made in the JSONObject class found at src/main/java/org/json/JSONObject.java
+* The code uses a Spliterator to stream every individual JSON element within the root JSONObject, regardless of nesting, to apply different methods to.
+* Examples of how this could be used can be found within the test cases created in the file src/test/java/org/json/junit/Milestone4Test.java
+* Build instructions remain the same from the origin JSON-java package detailed further below
+
 # Milestone 3
 * This milestone adds one static method to the XML class found at src/main/java/org/json
 ````
