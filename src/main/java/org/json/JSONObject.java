@@ -15,18 +15,12 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.IdentityHashMap;
-import java.util.Iterator;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.ResourceBundle;
-import java.util.Set;
+import java.util.function.Consumer;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 /**
  * A JSONObject is an unordered collection of name/value pairs. Its external
@@ -2713,4 +2707,115 @@ public class JSONObject {
             "JavaBean object contains recursively defined member variable of key " + quote(key)
         );
     }
+
+
+    /**
+     * Milestone 4 =====================================================================================
+     */
+
+//    public Stream<JSONObject> toStream() {
+//        return StreamSupport.stream(new JSONSpliterator(this), false);
+//    }
+//
+//    class JSONSpliterator implements Spliterator<JSONObject> {
+//        private JSONObject root;
+//        private JSONObject currNode;
+//
+//        public JSONSpliterator(JSONObject root) {
+//            this.root = root;
+//            this.currNode = root;
+//        }
+//
+//        @Override
+//        public boolean tryAdvance(Consumer<? super JSONObject> action) {
+//
+//
+//            for(Map.Entry<String, Object> entry : currNode.entrySet()) {
+//                if(entry.getValue() instanceof  JSONObject) {
+//                    currNode = (JSONObject)entry.getValue();
+//                    action.accept(currNode);
+//                    tryAdvance(action);
+//                }
+//            }
+//
+//            // reached the end of the traversal
+//            if(currNode == root)
+//                return false;
+//            else
+//                return true;
+//        }
+//
+//        @Override
+//        public Spliterator<JSONObject> trySplit() {
+//            return null;
+//        }
+//
+//        @Override
+//        public long estimateSize() {
+//            return Long.MAX_VALUE;
+//        }
+//
+//        public int characteristics() {
+//            return Spliterator.IMMUTABLE | Spliterator.NONNULL;
+//        }
+//    }
+
+    public Stream<JSONObject> toStream() {
+        return StreamSupport.stream(new JSONSpliterator(this), false);
+    }
+
+    class JSONSpliterator implements Spliterator<JSONObject> {
+        private JSONObject root;
+        private JSONObject currNode;
+
+        public JSONSpliterator(JSONObject root) {
+            this.root = root;
+            this.currNode = root;      // set currNode to first Entry
+        }
+
+        @Override
+        public boolean tryAdvance(Consumer<? super JSONObject> action) {
+
+            JSONObject lastNode = currNode;
+
+            for(Map.Entry<String, Object> entry : currNode.entrySet()) {
+                if(entry.getValue() instanceof  JSONObject) {
+                    currNode = (JSONObject) entry.getValue();
+                    action.accept(new JSONObject().put(entry.getKey(), entry.getValue()));
+                    tryAdvance(action);
+                }
+                else if(entry.getValue() instanceof JSONArray) {
+                    for(Object arrEntry : (JSONArray)entry.getValue()) {
+                        action.accept((JSONObject) arrEntry);
+                    }
+                }
+                else {
+                    action.accept(new JSONObject().put(entry.getKey(), entry.getValue()));
+                }
+            }
+
+            currNode = lastNode;        // go back, now that it has been traversed
+
+            // reached the end of the traversal
+            if(currNode.equals(root))
+                return false;
+            else
+                return true;
+        }
+
+        @Override
+        public Spliterator<JSONObject> trySplit() {
+            return null;
+        }
+
+        @Override
+        public long estimateSize() {
+            return Long.MAX_VALUE;
+        }
+
+        public int characteristics() {
+            return Spliterator.IMMUTABLE | Spliterator.NONNULL;
+        }
+    }
+
 }
