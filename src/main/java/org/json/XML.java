@@ -4,6 +4,7 @@ package org.json;
 Public Domain.
 */
 
+
 import java.io.Reader;
 import java.io.StringReader;
 import java.math.BigDecimal;
@@ -13,6 +14,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.concurrent.*;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 
 /**
@@ -1269,4 +1273,39 @@ public class XML {
         }
         return sb.toString();
     }
+
+    /**
+     *  Start of Milestone 5 ============================================================
+     */
+
+    public interface CallbackFunc {
+        void callback(JSONObject jo);
+    }
+
+    static class JSONFuture {
+        private ExecutorService executorService = Executors.newSingleThreadExecutor();
+
+        public Future<JSONObject> toJSONObjectFuture(Reader reader, CallbackFunc func) throws Exception{
+            return executorService.submit(() -> {
+                JSONObject jo = XML.toJSONObject(reader);
+                func.callback(jo);
+                return jo;
+            });
+        }
+
+        public void stop() {
+            executorService.shutdown();
+        }
+    }
+
+    public static Future<JSONObject> toJSONObject(Reader reader, CallbackFunc func, Consumer<Exception> exceptionConsumer) {
+        Future<JSONObject> future = null;
+        try {
+            future = new JSONFuture().toJSONObjectFuture(reader, func);
+        } catch(Exception e) {
+            exceptionConsumer.accept(e);
+        }
+        return future;
+    }
+
 }
