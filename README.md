@@ -1,3 +1,9 @@
+# Milestone 5
+* This milestone adds an asynchronous version of the toJSONObject method, which has the signature: toJSONObject(Reader reader, CallbackFunc func, Consumer<Exception> exceptionConsumer)
+* Where the callback function dictates what should happen to the JSONObject on completion of the conversion
+* Having this method be asynchronous allows the client code to proceed after the method call.
+* JUnit tests for this method have been added in the file src/test/java/org/json/junit/Milestone5Test.java
+
 # Milestone 4
 * This milestone adds stream functionality to JSONObjects. The changes to make this happen were made in the JSONObject class found at src/main/java/org/json/JSONObject.java
 * The code uses a Spliterator to stream every individual JSON element within the root JSONObject, regardless of nesting, to apply different methods to.
